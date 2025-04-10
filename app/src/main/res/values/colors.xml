@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <!-- res/values/colors.xml -->
+    <color name="primaryDark">#303F9F</color>
+    <color name="accentColor">#FFC107</color>
+    <color name="backgroundColor">#F9F9F9</color>
+    <color name="ayahBgColor">#FFFFFF</color>
+    <color name="primaryColor">#00897B</color>
+    <color name="arabicTextColor">#1A237E</color>
+
+</resources>
