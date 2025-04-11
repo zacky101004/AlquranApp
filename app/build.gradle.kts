@@ -1,6 +1,5 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
 }
 
 android {
@@ -14,8 +13,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        // ✅ Retrofit base URL sebagai konstanta global (BuildConfig.BASE_URL)
-        buildConfigField("String", "BASE_URL", "\"https://api.quran.com/v4/\"")
+        // ✅ Gunakan BASE_URL dari https://alquran.cloud/api
+        buildConfigField("String", "BASE_URL", "\"https://api.alquran.cloud/v1/\"")
     }
 
     buildTypes {
@@ -29,7 +28,7 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true
+        buildConfig = true // ✅ WAJIB untuk gunakan buildConfigField
     }
 
     compileOptions {
@@ -38,40 +37,24 @@ android {
     }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-}
-
 dependencies {
-    // ✅ Retrofit & Gson
+    // ✅ AppCompat untuk AppCompatActivity
+    implementation("androidx.appcompat:appcompat:1.6.1")
+
+    // ✅ Retrofit & Gson untuk koneksi API
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    // ✅ RecyclerView
+    // ✅ RecyclerView untuk daftar Surah
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
-    // ✅ Material Design
+    // ✅ Material Design untuk komponen UI modern
     implementation("com.google.android.material:material:1.11.0")
 
-    // ✅ Glide (untuk gambar jika diperlukan)
-    implementation("com.github.bumptech.glide:glide:4.15.1")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
-
-    // ✅ WorkManager (untuk notifikasi harian)
+    // ✅ WorkManager untuk notifikasi harian
     implementation("androidx.work:work-runtime:2.9.0")
 
-    // ✅ Lifecycle dan Activity KTX
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.activity:activity-ktx:1.8.2")
-
-    // ✅ Room Database
+    // ✅ Room Database (untuk fitur bookmark)
     implementation("androidx.room:room-runtime:2.6.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-
-    // ✅ Audio player (Media3 ExoPlayer)
-    implementation("androidx.media3:media3-exoplayer:1.3.1")
-    implementation("androidx.media3:media3-ui:1.3.1")
 }

@@ -1,12 +1,13 @@
 package com.example.alquranapp.ui;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.alquranapp.R;
-import com.example.alquranapp.database.AppDatabase;
+import com.example.alquranapp.data.AppDatabase;
 import com.example.alquranapp.model.Bookmark;
 import java.util.List;
 
@@ -27,14 +28,23 @@ public class BookmarkActivity extends AppCompatActivity {
     }
 
     private void loadBookmarks() {
-        AppDatabase db = AppDatabase.getInstance(this);
-        List<Bookmark> bookmarkList = db.bookmarkDao().getAllBookmarks();
+        new LoadBookmarksTask().execute();
+    }
 
-        if (bookmarkList.isEmpty()) {
-            Toast.makeText(this, "Belum ada bookmark", Toast.LENGTH_SHORT).show();
+    private class LoadBookmarksTask extends AsyncTask<Void, Void, List<Bookmark>> {
+        @Override
+        protected List<Bookmark> doInBackground(Void... voids) {
+            AppDatabase db = AppDatabase.getInstance(BookmarkActivity.this);
+            return db.bookmarkDao().getAll();
         }
 
-        bookmarkAdapter = new BookmarkAdapter(bookmarkList);
-        rvBookmark.setAdapter(bookmarkAdapter);
+        @Override
+        protected void onPostExecute(List<Bookmark> bookmarkList) {
+            if (bookmarkList.isEmpty()) {
+                Toast.makeText(BookmarkActivity.this, "Belum ada bookmark", Toast.LENGTH_SHORT).show();
+            }
+            bookmarkAdapter = new BookmarkAdapter(bookmarkList);
+            rvBookmark.setAdapter(bookmarkAdapter);
+        }
     }
 }

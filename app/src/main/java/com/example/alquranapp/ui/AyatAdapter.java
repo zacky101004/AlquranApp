@@ -1,7 +1,7 @@
 package com.example.alquranapp.ui;
 
-import android.content.Context;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,107 +20,65 @@ import com.example.alquranapp.model.Bookmark;
 import java.io.IOException;
 import java.util.List;
 
-public class AyatAdapter extends RecyclerView.Adapter<AyatAdapter.ViewHolder> {
+public class AyatAdapter extends RecyclerView.Adapter<AyatAdapter.AyatViewHolder> {
 
-    private final List<Ayat> ayatList;
+    private List<Ayat> ayatList;
+    private String surahName;
+    private int surahId;
     private MediaPlayer mediaPlayer;
-    private int currentPlayingPosition = -1;
 
-    public AyatAdapter(List<Ayat> ayatList) {
+    public AyatAdapter(List<Ayat> ayatList, String surahName, int surahId) {
         this.ayatList = ayatList;
+        this.surahName = surahName;
+        this.surahId = surahId;
+        this.mediaPlayer = new MediaPlayer();
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_ayat, parent, false);
-        return new ViewHolder(view);
+    public AyatViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new AyatViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_ayat, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull AyatViewHolder holder, int position) {
         Ayat ayat = ayatList.get(position);
-        Context context = holder.itemView.getContext();
-        final int adapterPosition = holder.getBindingAdapterPosition();
+        holder.tvArabic.setText(ayat.getText());
+        holder.tvNumber.setText("Ayat " + ayat.getNumberInSurah());
+        holder.tvTranslation.setText(ayat.getTranslation() != null ? ayat.getTranslation() : "Terjemahan tidak tersedia");
 
-        holder.tvNumber.setText(String.valueOf(ayat.getVerseNumber()));
-        holder.tvArabic.setText(ayat.getTextArabic());
-        holder.tvTranslation.setText(ayat.getTranslation());
+        // Cek apakah ayat ini sudah di-bookmark
+        new CheckBookmarkTask(holder, ayat).execute();
 
-        AppDatabase db = AppDatabase.getInstance(context);
-        boolean isBookmarked = isAyatBookmarked(db, ayat);
-
-        holder.btnBookmark.setImageResource(isBookmarked ? R.drawable.ic_bookmark : R.drawable.ic_bookmark_border);
-
+        // Tombol Bookmark
         holder.btnBookmark.setOnClickListener(v -> {
-            if (isAyatBookmarked(db, ayat)) {
-                Bookmark existing = db.bookmarkDao().getBySurahAndAyat(ayat.getSurahId(), ayat.getVerseNumber());
-                if (existing != null) {
-                    db.bookmarkDao().delete(existing);
-                    Toast.makeText(context, "Bookmark dihapus", Toast.LENGTH_SHORT).show();
-                    holder.btnBookmark.setImageResource(R.drawable.ic_bookmark_border);
-                }
-            } else {
-                Bookmark bookmark = new Bookmark(
-                        ayat.getSurahId(),
-                        ayat.getSurahName(),
-                        ayat.getVerseNumber(),
-                        ayat.getTextArabic(),
-                        ayat.getTranslation()
-                );
-                db.bookmarkDao().insert(bookmark);
-                Toast.makeText(context, "Ayat ditambahkan ke bookmark", Toast.LENGTH_SHORT).show();
-                holder.btnBookmark.setImageResource(R.drawable.ic_bookmark);
-            }
+            new ToggleBookmarkTask(holder, ayat).execute();
         });
 
-        holder.btnPlay.setImageResource(adapterPosition == currentPlayingPosition && mediaPlayer != null && mediaPlayer.isPlaying()
-                ? R.drawable.ic_pause
-                : R.drawable.ic_play);
-
+        // Tombol Play Audio
         holder.btnPlay.setOnClickListener(v -> {
-            if (adapterPosition == currentPlayingPosition && mediaPlayer != null) {
+            if (ayat.getAudio() != null) {
                 if (mediaPlayer.isPlaying()) {
-                    mediaPlayer.pause();
+                    mediaPlayer.stop();
+                    mediaPlayer.reset();
                     holder.btnPlay.setImageResource(R.drawable.ic_play);
-                    Toast.makeText(context, "Audio dijeda", Toast.LENGTH_SHORT).show();
                 } else {
-                    mediaPlayer.start();
-                    holder.btnPlay.setImageResource(R.drawable.ic_pause);
-                    Toast.makeText(context, "Audio dilanjutkan", Toast.LENGTH_SHORT).show();
+                    try {
+                        mediaPlayer.reset();
+                        mediaPlayer.setDataSource(ayat.getAudio());
+                        mediaPlayer.prepare();
+                        mediaPlayer.start();
+                        holder.btnPlay.setImageResource(R.drawable.ic_pause);
+                        mediaPlayer.setOnCompletionListener(mp -> {
+                            holder.btnPlay.setImageResource(R.drawable.ic_play);
+                            mediaPlayer.reset();
+                        });
+                    } catch (IOException e) {
+                        Toast.makeText(v.getContext(), "Gagal memutar audio: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             } else {
-                if (mediaPlayer != null) {
-                    mediaPlayer.stop();
-                    mediaPlayer.release();
-                    mediaPlayer = null;
-                    notifyItemChanged(currentPlayingPosition);
-                }
-
-                String audioUrl = "https://cdn.islamic.network/quran/audio/128/ar.alafasy/" + ayat.getVerseNumber() + ".mp3";
-                mediaPlayer = new MediaPlayer();
-                try {
-                    mediaPlayer.setDataSource(audioUrl);
-                    mediaPlayer.setOnPreparedListener(mp -> {
-                        mp.start();
-                        holder.btnPlay.setImageResource(R.drawable.ic_pause);
-                        Toast.makeText(context, "Memutar ayat " + ayat.getVerseNumber(), Toast.LENGTH_SHORT).show();
-                    });
-                    mediaPlayer.setOnCompletionListener(mp -> {
-                        holder.btnPlay.setImageResource(R.drawable.ic_play);
-                        currentPlayingPosition = -1;
-                        mediaPlayer.release();
-                        mediaPlayer = null;
-                        notifyItemChanged(adapterPosition);
-                    });
-                    mediaPlayer.prepareAsync();
-                    currentPlayingPosition = adapterPosition;
-                    notifyDataSetChanged();
-                } catch (IOException e) {
-                    Toast.makeText(context, "Gagal memutar audio", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
+                Toast.makeText(v.getContext(), "Audio tidak tersedia", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -130,24 +88,85 @@ public class AyatAdapter extends RecyclerView.Adapter<AyatAdapter.ViewHolder> {
         return ayatList.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvNumber, tvArabic, tvTranslation;
-        ImageButton btnBookmark, btnPlay;
+    static class AyatViewHolder extends RecyclerView.ViewHolder {
+        TextView tvArabic, tvNumber, tvTranslation;
+        ImageButton btnPlay, btnBookmark;
 
-        ViewHolder(View view) {
-            super(view);
-            tvNumber = view.findViewById(R.id.tv_number);
-            tvArabic = view.findViewById(R.id.tv_arabic);
-            tvTranslation = view.findViewById(R.id.tv_translation);
-            btnBookmark = view.findViewById(R.id.btn_bookmark);
-            btnPlay = view.findViewById(R.id.btn_play);
+        AyatViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvArabic = itemView.findViewById(R.id.tv_arabic); // Ubah ke tv_arabic
+            tvNumber = itemView.findViewById(R.id.tv_number); // Ubah ke tv_number
+            tvTranslation = itemView.findViewById(R.id.tv_translation);
+            btnPlay = itemView.findViewById(R.id.btn_play);
+            btnBookmark = itemView.findViewById(R.id.btn_bookmark);
         }
     }
 
-    private boolean isAyatBookmarked(AppDatabase db, Ayat ayat) {
-        return db.bookmarkDao().getBySurahAndAyat(
-                ayat.getSurahId(),
-                ayat.getVerseNumber()
-        ) != null;
+    private class CheckBookmarkTask extends AsyncTask<Void, Void, Bookmark> {
+        private AyatViewHolder holder;
+        private Ayat ayat;
+
+        CheckBookmarkTask(AyatViewHolder holder, Ayat ayat) {
+            this.holder = holder;
+            this.ayat = ayat;
+        }
+
+        @Override
+        protected Bookmark doInBackground(Void... voids) {
+            AppDatabase db = AppDatabase.getInstance(holder.itemView.getContext());
+            return db.bookmarkDao().getBySurahAndAyat(surahId, ayat.getNumberInSurah());
+        }
+
+        @Override
+        protected void onPostExecute(Bookmark bookmark) {
+            holder.btnBookmark.setImageResource(bookmark != null ? R.drawable.ic_bookmark : R.drawable.ic_bookmark_border);
+            holder.btnBookmark.setTag(bookmark); // Simpan bookmark di tag untuk digunakan saat toggle
+        }
+    }
+
+    private class ToggleBookmarkTask extends AsyncTask<Void, Void, Boolean> {
+        private AyatViewHolder holder;
+        private Ayat ayat;
+
+        ToggleBookmarkTask(AyatViewHolder holder, Ayat ayat) {
+            this.holder = holder;
+            this.ayat = ayat;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            AppDatabase db = AppDatabase.getInstance(holder.itemView.getContext());
+            Bookmark existingBookmark = (Bookmark) holder.btnBookmark.getTag();
+            if (existingBookmark == null) {
+                Bookmark bookmark = new Bookmark(
+                        surahId,
+                        surahName,
+                        ayat.getNumberInSurah(),
+                        ayat.getText(),
+                        ayat.getTranslation() != null ? ayat.getTranslation() : "Terjemahan tidak tersedia"
+                );
+                db.bookmarkDao().insert(bookmark);
+                return true;
+            } else {
+                db.bookmarkDao().delete(existingBookmark);
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isBookmarked) {
+            holder.btnBookmark.setImageResource(isBookmarked ? R.drawable.ic_bookmark : R.drawable.ic_bookmark_border);
+            holder.btnBookmark.setTag(isBookmarked ? new Bookmark(surahId, surahName, ayat.getNumberInSurah(), ayat.getText(), ayat.getTranslation()) : null);
+            Toast.makeText(holder.itemView.getContext(), isBookmarked ? "Ayat ditambahkan ke bookmark" : "Ayat dihapus dari bookmark", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 }

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    card_view:cardElevation="4dp"
-    card_view:cardCornerRadius="12dp">
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_card"
         android:orientation="vertical"
-        android:padding="12dp"
-        android:background="@drawable/bg_card">
+        android:padding="12dp">
 
         <TextView
             android:id="@+id/tv_bookmark_verse_number"
@@ -20,36 +20,36 @@
             android:layout_height="wrap_content"
             android:text="Ayat 1"
             android:textColor="@android:color/black"
-            android:textStyle="bold"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tv_bookmark_arabic"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="4dp"
             android:text="النَّازِعَاتِ غَرْقًا"
-            android:textSize="22sp"
             android:textAlignment="viewEnd"
             android:textColor="@color/arabicTextColor"
-            android:paddingTop="4dp" />
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/tv_bookmark_translation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Demi (malaikat) yang mencabut (nyawa) dengan keras,"
-            android:textSize="16sp"
             android:paddingTop="4dp"
-            android:textColor="@android:color/black" />
+            android:text="Demi (malaikat) yang mencabut (nyawa) dengan keras,"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
 
         <ImageButton
             android:id="@+id/btn_delete_bookmark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:src="@drawable/ic_delete"
             android:background="@android:color/transparent"
             android:contentDescription="Hapus Bookmark"
-            android:tint="@android:color/holo_red_dark"/>
+            android:src="@drawable/ic_delete"
+            app:tint="@android:color/holo_red_dark" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

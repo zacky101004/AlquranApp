@@ -11,6 +11,7 @@ import java.util.List;
 
 @Dao
 public interface BookmarkDao {
+
     @Insert
     void insert(Bookmark bookmark);
 
@@ -22,6 +23,4 @@ public interface BookmarkDao {
 
     @Query("SELECT * FROM bookmarks WHERE surahId = :surahId AND ayatNumber = :ayatNumber LIMIT 1")
     Bookmark getBySurahAndAyat(int surahId, int ayatNumber);
-
-    List<Bookmark> getAllBookmarks();
 }

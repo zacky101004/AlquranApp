@@ -1,5 +1,6 @@
 package com.example.alquranapp.ui;
 
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.alquranapp.R;
-import com.example.alquranapp.database.AppDatabase;
+import com.example.alquranapp.data.AppDatabase;
 import com.example.alquranapp.model.Bookmark;
 import java.util.List;
 
@@ -32,19 +33,12 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Bookmark bookmark = bookmarkList.get(position);
-        holder.tvVerseNumber.setText("Ayat " + bookmark.getVerseNumber());
+        holder.tvVerseNumber.setText(bookmark.getVerseNumber());
         holder.tvArabic.setText(bookmark.getArabicText());
         holder.tvTranslation.setText(bookmark.getTranslation());
 
         holder.btnDelete.setOnClickListener(v -> {
-            AppDatabase db = AppDatabase.getInstance(v.getContext());
-            db.bookmarkDao().delete(bookmark);
-
-            bookmarkList.remove(position);
-            notifyItemRemoved(position);
-            notifyItemRangeChanged(position, bookmarkList.size());
-
-            Toast.makeText(v.getContext(), "Bookmark dihapus", Toast.LENGTH_SHORT).show();
+            new DeleteBookmarkTask(holder, position).execute();
         });
     }
 
@@ -63,6 +57,32 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
             tvArabic = view.findViewById(R.id.tv_bookmark_arabic);
             tvTranslation = view.findViewById(R.id.tv_bookmark_translation);
             btnDelete = view.findViewById(R.id.btn_delete_bookmark);
+        }
+    }
+
+    private class DeleteBookmarkTask extends AsyncTask<Void, Void, Void> {
+        private ViewHolder holder;
+        private int position;
+
+        DeleteBookmarkTask(ViewHolder holder, int position) {
+            this.holder = holder;
+            this.position = position;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            AppDatabase db = AppDatabase.getInstance(holder.itemView.getContext());
+            Bookmark bookmark = bookmarkList.get(position);
+            db.bookmarkDao().delete(bookmark);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            bookmarkList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, bookmarkList.size());
+            Toast.makeText(holder.itemView.getContext(), "Bookmark dihapus", Toast.LENGTH_SHORT).show();
         }
     }
 }

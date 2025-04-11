@@ -1,24 +1,41 @@
 package com.example.alquranapp.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Surah {
-    private int id;
-    private String nameArabic;
-    private String nameSimple;
-    private String translatedName;
 
-    public int getId() {
-        return id;
+    @SerializedName("number")
+    private int number;
+
+    @SerializedName("name")
+    private String name;
+
+    @SerializedName("englishName")
+    private String englishName;
+
+    @SerializedName("englishNameTranslation")
+    private String englishNameTranslation;
+
+    @SerializedName("numberOfAyahs")
+    private int numberOfAyahs;
+
+    public int getNumber() {
+        return number;
     }
 
-    public String getNameArabic() {
-        return nameArabic;
+    public String getName() {
+        return name;
     }
 
-    public String getNameSimple() {
-        return nameSimple;
+    public String getEnglishName() {
+        return englishName;
     }
 
-    public String getTranslatedName() {
-        return translatedName;
+    public String getEnglishNameTranslation() {
+        return englishNameTranslation;
+    }
+
+    public int getNumberOfAyahs() {
+        return numberOfAyahs;
     }
 }

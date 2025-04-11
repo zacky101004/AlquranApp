@@ -1,61 +1,42 @@
 package com.example.alquranapp.ui;
 
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.alquranapp.R;
 import com.example.alquranapp.model.Surah;
-import java.util.ArrayList;
+
 import java.util.List;
 
-public class SurahAdapter extends RecyclerView.Adapter<SurahAdapter.ViewHolder> {
+public class SurahAdapter extends RecyclerView.Adapter<SurahAdapter.SurahViewHolder> {
 
-    private List<Surah> surahList;
-    private List<Surah> originalList;
-
-    public SurahAdapter(List<Surah> surahList) {
-        this.surahList = surahList;
-        this.originalList = new ArrayList<>(surahList);
+    public interface OnItemClickListener {
+        void onItemClick(Surah surah);
     }
 
-    public void filter(String text) {
-        surahList.clear();
-        if (text.isEmpty()) {
-            surahList.addAll(originalList);
-        } else {
-            for (Surah surah : originalList) {
-                if (surah.getNameSimple().toLowerCase().contains(text.toLowerCase())) {
-                    surahList.add(surah);
-                }
-            }
-        }
-        notifyDataSetChanged();
+    private List<Surah> surahList;
+    private OnItemClickListener listener;
+
+    public SurahAdapter(List<Surah> surahList, OnItemClickListener listener) {
+        this.surahList = surahList;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_surah, parent, false);
-        return new ViewHolder(view);
+    public SurahViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new SurahViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_surah, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SurahViewHolder holder, int position) {
         Surah surah = surahList.get(position);
-        holder.tvName.setText(surah.getNameSimple());
-        holder.tvTranslation.setText(surah.getTranslatedName());
-
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), SurahDetailActivity.class);
-            intent.putExtra("surah_id", surah.getId());
-            intent.putExtra("surah_name", surah.getNameSimple());
-            v.getContext().startActivity(intent);
-        });
+        holder.bind(surah, listener);
     }
 
     @Override
@@ -63,13 +44,19 @@ public class SurahAdapter extends RecyclerView.Adapter<SurahAdapter.ViewHolder> 
         return surahList.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvTranslation;
+    static class SurahViewHolder extends RecyclerView.ViewHolder {
+        TextView tvSurahName, tvTranslation;
 
-        ViewHolder(View itemView) {
+        SurahViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvName = itemView.findViewById(R.id.tv_name);
+            tvSurahName = itemView.findViewById(R.id.tv_name);
             tvTranslation = itemView.findViewById(R.id.tv_translation);
+        }
+
+        void bind(Surah surah, OnItemClickListener listener) {
+            tvSurahName.setText(surah.getEnglishName());
+            tvTranslation.setText(surah.getEnglishNameTranslation());
+            itemView.setOnClickListener(v -> listener.onItemClick(surah));
         }
     }
 }

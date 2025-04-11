@@ -2,33 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@color/backgroundColor">
+    android:padding="16dp">
 
-    <!-- Search -->
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:queryHint="Cari surah..."
-        android:iconifiedByDefault="false"/>
+        android:iconifiedByDefault="false"
+        android:queryHint="Cari surah..." />
 
-    <!-- Tombol Lihat Bookmark -->
     <Button
         android:id="@+id/btn_view_bookmarks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Lihat Bookmark"
         android:layout_marginTop="12dp"
-        android:backgroundTint="@color/purple_500"
+        android:backgroundTint="@color/primaryColor"
+        android:text="Lihat Bookmark"
         android:textColor="@android:color/white" />
 
-    <!-- List Surah -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_surah"
+        android:id="@+id/recyclerViewSurah"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:paddingTop="12dp"/>
+        android:clipToPadding="false"
+        android:paddingTop="12dp" />
 </LinearLayout>

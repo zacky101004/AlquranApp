@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase;
 import com.example.alquranapp.model.Bookmark;
 import com.example.alquranapp.data.BookmarkDao;
 
-@Database(entities = {Bookmark.class}, version = 1)
+@Database(entities = {Bookmark.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;
@@ -21,7 +21,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     context.getApplicationContext(),
                     AppDatabase.class,
                     "alquran_db"
-            ).allowMainThreadQueries().build(); // gunakan .allowMainThreadQueries() untuk sementara
+            ).build();
         }
         return instance;
     }
