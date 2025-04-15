@@ -1,30 +1,23 @@
 package com.example.alquranapp.ui;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.alquranapp.R;
 import com.example.alquranapp.model.Surah;
-
+import java.util.ArrayList; // Import ditambahkan
 import java.util.List;
 
 public class SurahAdapter extends RecyclerView.Adapter<SurahAdapter.SurahViewHolder> {
 
-    public interface OnItemClickListener {
-        void onItemClick(Surah surah);
-    }
+    private final List<Surah> surahList;
 
-    private List<Surah> surahList;
-    private OnItemClickListener listener;
-
-    public SurahAdapter(List<Surah> surahList, OnItemClickListener listener) {
-        this.surahList = surahList;
-        this.listener = listener;
+    public SurahAdapter(List<Surah> surahList) {
+        this.surahList = surahList != null ? surahList : new ArrayList<>();
     }
 
     @NonNull
@@ -36,7 +29,18 @@ public class SurahAdapter extends RecyclerView.Adapter<SurahAdapter.SurahViewHol
     @Override
     public void onBindViewHolder(@NonNull SurahViewHolder holder, int position) {
         Surah surah = surahList.get(position);
-        holder.bind(surah, listener);
+        if (surah == null) return;
+
+        holder.tvSurahNumber.setText(String.valueOf(surah.getNumber()));
+        holder.tvSurahName.setText(surah.getEnglishName() != null ? surah.getEnglishName() : "Unknown");
+        holder.tvSurahArabicName.setText(surah.getName() != null ? surah.getName() : "");
+        holder.tvAyahCount.setText(surah.getNumberOfAyahs() + " Ayahs");
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), SurahDetailActivity.class);
+            intent.putExtra("surah_id", surah.getNumber());
+            intent.putExtra("surah_name", surah.getEnglishName());
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
 
     @Override
@@ -45,18 +49,14 @@ public class SurahAdapter extends RecyclerView.Adapter<SurahAdapter.SurahViewHol
     }
 
     static class SurahViewHolder extends RecyclerView.ViewHolder {
-        TextView tvSurahName, tvTranslation;
+        TextView tvSurahNumber, tvSurahName, tvSurahArabicName, tvAyahCount;
 
         SurahViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvSurahName = itemView.findViewById(R.id.tv_name);
-            tvTranslation = itemView.findViewById(R.id.tv_translation);
-        }
-
-        void bind(Surah surah, OnItemClickListener listener) {
-            tvSurahName.setText(surah.getEnglishName());
-            tvTranslation.setText(surah.getEnglishNameTranslation());
-            itemView.setOnClickListener(v -> listener.onItemClick(surah));
+            tvSurahNumber = itemView.findViewById(R.id.tvSurahNumber);
+            tvSurahName = itemView.findViewById(R.id.tvSurahName);
+            tvSurahArabicName = itemView.findViewById(R.id.tvSurahArabicName);
+            tvAyahCount = itemView.findViewById(R.id.tvAyahCount);
         }
     }
 }

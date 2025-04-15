@@ -27,14 +27,14 @@
             </intent-filter>
         </activity>
 
-        <!-- Bookmark Activity -->
-        <activity
-            android:name=".ui.BookmarkActivity"
-            android:exported="false" />
-
         <!-- Surah Detail Activity -->
         <activity
             android:name=".ui.SurahDetailActivity"
+            android:exported="false" />
+
+        <!-- Juz Detail Activity -->
+        <activity
+            android:name=".ui.JuzDetailActivity"
             android:exported="false" />
     </application>
 

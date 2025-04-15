@@ -31,11 +31,14 @@
     <color name="teal_700">#018786</color>
 
     <color name="primaryGreen">#00897B</color>
+    <color name="backgroundCream">#F9F9F9</color>
+    <color name="errorRed">#FF0000</color>
 
 
 
     <color name="textColorPrimary">#212121</color>
     <color name="textColorSecondary">#757575</color>
+
 
 
 </resources>

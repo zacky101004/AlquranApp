@@ -1,55 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
+    android:background="@android:color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_card"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tv_bookmark_verse_number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ayat 1"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tv_bookmark_arabic"
+        <!-- Konten utama bookmark -->
+        <LinearLayout
+            android:id="@+id/content_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="4dp"
-            android:text="النَّازِعَاتِ غَرْقًا"
-            android:textAlignment="viewEnd"
-            android:textColor="@color/arabicTextColor"
-            android:textSize="22sp" />
+            android:layout_toStartOf="@id/btnDelete"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_bookmark_translation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="4dp"
-            android:text="Demi (malaikat) yang mencabut (nyawa) dengan keras,"
-            android:textColor="@android:color/black"
-            android:textSize="16sp" />
+            <TextView
+                android:id="@+id/tvFolder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Folder"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_marginBottom="4dp"/>
 
+            <TextView
+                android:id="@+id/tvSurah"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Surah"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:id="@+id/tvAyat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ayat"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:id="@+id/tvAyatText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ayat Text"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:gravity="end"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:id="@+id/tvTranslation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Translation"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:gravity="start"/>
+        </LinearLayout>
+
+        <!-- Tombol Hapus -->
         <ImageButton
-            android:id="@+id/btn_delete_bookmark"
+            android:id="@+id/btnDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:background="@android:color/transparent"
-            android:contentDescription="Hapus Bookmark"
-            android:src="@drawable/ic_delete"
-            app:tint="@android:color/holo_red_dark" />
-    </LinearLayout>
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_delete"
+            app:tint="@android:color/holo_red_dark"
+            android:contentDescription="Hapus Bookmark"/>
+    </RelativeLayout>
 </androidx.cardview.widget.CardView>

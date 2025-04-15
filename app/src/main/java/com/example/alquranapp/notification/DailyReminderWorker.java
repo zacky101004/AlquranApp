@@ -1,74 +1,54 @@
 package com.example.alquranapp.notification;
 
-import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
-
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-
 import com.example.alquranapp.R;
-import com.example.alquranapp.ui.MainActivity;
+import java.util.concurrent.TimeUnit;
 
 public class DailyReminderWorker extends Worker {
 
-    public DailyReminderWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
-        super(context, workerParams);
+    private static final String CHANNEL_ID = "daily_reminder_channel";
+    private static final int NOTIFICATION_ID = 1;
+
+    public DailyReminderWorker(@NonNull Context context, @NonNull WorkerParameters params) {
+        super(context, params);
     }
 
     @NonNull
     @Override
     public Result doWork() {
-        sendNotification();
+        showNotification();
         return Result.success();
     }
 
-    private void sendNotification() {
-        String channelId = "daily_reminder_channel";
-        String channelName = "Daily Quran Reminder";
-
-        NotificationManager notificationManager =
-                (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+    private void showNotification() {
+        NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    channelId,
-                    channelName,
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Daily Reminder", NotificationManager.IMPORTANCE_DEFAULT);
             notificationManager.createNotificationChannel(channel);
         }
 
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                getApplicationContext(),
-                0,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), channelId)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle("Baca Al-Qur'an Hari Ini")
-                .setContentText("Yuk luangkan waktu sejenak untuk membaca Al-Qur’an.")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
+                .setContentTitle("Pengingat Harian")
+                .setContentText("Jangan lupa membaca Al-Quran hari ini!")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-        }
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
 
-        notificationManager.notify(1001, builder.build());
+    public static void scheduleDailyReminder(Context context) {
+        PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(DailyReminderWorker.class, 1, TimeUnit.DAYS)
+                .build();
+        WorkManager.getInstance(context).enqueue(workRequest);
     }
 }

@@ -1,32 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundColor"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/backgroundCream">
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/search_view"
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primaryGreen"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:title="Al-Quran"
+        app:titleTextColor="@android:color/white" />
+
+    <!-- Tab Layout -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:iconifiedByDefault="false"
-        android:queryHint="Cari surah..." />
+        app:tabIndicatorColor="@color/primaryGreen"
+        app:tabSelectedTextColor="@color/primaryGreen"
+        app:tabTextColor="@color/textColorSecondary" />
 
-    <Button
-        android:id="@+id/btn_view_bookmarks"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:backgroundTint="@color/primaryColor"
-        android:text="Lihat Bookmark"
-        android:textColor="@android:color/white" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewSurah"
+    <!-- ViewPager for Tabs -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingTop="12dp" />
+        android:layout_weight="1" />
+
 </LinearLayout>

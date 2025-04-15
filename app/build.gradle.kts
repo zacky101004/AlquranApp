@@ -57,4 +57,10 @@ dependencies {
     // ✅ Room Database (untuk fitur bookmark)
     implementation("androidx.room:room-runtime:2.6.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
+
+    // ✅ ViewPager2 untuk navigasi tab (Surah, Juz, Bookmark)
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+
+    // ✅ CardView untuk item Juz
+    implementation("androidx.cardview:cardview:1.0.0")
 }
